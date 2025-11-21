@@ -3,11 +3,11 @@ import css from "./MovieModal.module.css";
 import type { Movie } from "../../types/movie";
 
 interface MovieModalProps {
-	movie: Movie | null;
+	data: Movie | null;
 	onClose: () => void;
 }
 
-export default function MovieModal({ movie, onClose }: MovieModalProps) {
+export default function MovieModal({ data, onClose }: MovieModalProps) {
 	const container = document.getElementById("modal-root");
 	if (!container) return null;
 
@@ -34,18 +34,18 @@ export default function MovieModal({ movie, onClose }: MovieModalProps) {
 						&times;
 					</button>
 					<img
-						src={`https://image.tmdb.org/t/p/original${movie?.backdrop_path}}`}
+						src={`https://image.tmdb.org/t/p/original${data?.backdrop_path}}`}
 						alt="movie_title"
 						className={css.image}
 					/>
 					<div className={css.content}>
-						<h2>{movie?.title}</h2>
-						<p>{movie?.overview}</p>
+						<h2>{data?.title}</h2>
+						<p>{data?.overview}</p>
 						<p>
-							<strong>Release Date:</strong> {movie?.release_date}
+							<strong>Release Date:</strong> {data?.release_date}
 						</p>
 						<p>
-							<strong>Rating:</strong> {movie?.vote_average}/10
+							<strong>Rating:</strong> {data?.vote_average}/10
 						</p>
 					</div>
 				</div>

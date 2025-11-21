@@ -1,19 +1,20 @@
 import toast, { Toaster } from "react-hot-toast";
 import { useId } from "react";
 import css from "./SearchBar.module.css";
+import type { SetStateAction } from "react";
 
 interface SearchBarProps {
-	onSubmit: (value: string) => void;
+	setValue: React.Dispatch<SetStateAction<string>>;
 }
 
-export default function SearchBar({ onSubmit }: SearchBarProps) {
+export default function SearchBar({ setValue }: SearchBarProps) {
 	const idForm = useId();
 	const dataFromForm = (formData: FormData) => {
 		const data = formData.get("query") as string;
 		if (!data) {
 			toast.error("Please enter your search query.");
 		} else {
-			onSubmit(data);
+			setValue(data);
 		}
 	};
 

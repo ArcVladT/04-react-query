@@ -3,14 +3,17 @@ import type { Movie } from "../../types/movie";
 
 interface MoiveGridProps {
 	onSelect: (value: Movie) => void;
-	movies: Movie[];
+	data: Movie[];
 }
 
-export default function MoiveGrid({ onSelect, movies }: MoiveGridProps) {
+export default function MoiveGrid({ onSelect, data }: MoiveGridProps) {
+	if (data === undefined) {
+		return;
+	}
 	return (
 		<>
 			<ul className={css.grid}>
-				{movies.map((value) => (
+				{data.map((value) => (
 					<li key={String(value.id)} onClick={() => onSelect(value)}>
 						<div className={css.card}>
 							<img

@@ -1,39 +1,33 @@
 import SearchBar from "../SearchBar/SearchBar";
 import fetchMovies from "../../services/movieService";
-import toast, { Toaster } from "react-hot-toast";
+import { Toaster } from "react-hot-toast";
 import type { Movie } from "../../types/movie";
 import MoiveGrid from "../MovieGrid/MovieGrid";
 import { useEffect, useState } from "react";
 import Loader from "../Loader/Loader";
 import ErrorMessage from "../ErrorMessage/ErrorMessage";
 import MovieModal from "../MovieModal/MovieModal";
+import { useQuery } from "@tanstack/react-query";
+import ReactPaginate from "react-paginate";
+import css from "./App.module.css";
 
 function App() {
-	const [movies, setMovies] = useState<Movie[]>([]);
-	const [error, setError] = useState(false);
-	const [loading, setLoading] = useState(false);
 	const [close, setClose] = useState(false);
 	const [movie, setMovie] = useState<Movie | null>(null);
+	const [value, setValue] = useState("");
+	const [page, setPage] = useState(1);
 
-	const onSubmit = async (value: string) => {
-		try {
-			setError(false);
-			setMovies([]);
-			setLoading(true);
+	const { data, isLoading, isError } = useQuery({
+		queryKey: ["person", value, page],
+		queryFn: () => fetchMovies(value, page),
+		enabled: value !== "",
+	});
+	// console.log(value !== "");
+	// console.log(data?.results);
 
-			const data: Movie[] = await fetchMovies(value);
-			if (!(data.length > 0)) {
-				toast.error("No movies found for your request.");
-			}
-			setMovies(data);
-			setLoading(false);
-		} catch (e) {
-			console.log("error:", e);
+	// console.log(data.results);
+	const totalPages = data?.total_pages ?? 0;
 
-			setLoading(false);
-			setError(true);
-		}
-	};
 	const selectMovie = (value: Movie) => {
 		setMovie(value);
 		setClose(true);
@@ -63,12 +57,25 @@ function App() {
 	return (
 		<>
 			<div>
-				<SearchBar onSubmit={onSubmit} />
+				<SearchBar setValue={setValue} />
 				<Toaster position="top-center" reverseOrder={false} />
-				<MoiveGrid onSelect={selectMovie} movies={movies}></MoiveGrid>
-				{loading && <Loader />}
-				{error && <ErrorMessage />}
-				{close && <MovieModal onClose={onClose} movie={movie}></MovieModal>}
+				{data && totalPages > 0 && (
+					<ReactPaginate
+						pageCount={Math.ceil(totalPages ?? 0)}
+						pageRangeDisplayed={5}
+						marginPagesDisplayed={1}
+						onPageChange={({ selected }) => setPage(selected + 1)}
+						forcePage={page - 1}
+						containerClassName={css.pagination}
+						activeClassName={css.active}
+						nextLabel="→"
+						previousLabel="←"
+					/>
+				)}
+				<MoiveGrid onSelect={selectMovie} data={data?.results}></MoiveGrid>
+				{isLoading && <Loader />}
+				{isError && <ErrorMessage />}
+				{close && <MovieModal onClose={onClose} data={movie}></MovieModal>}
 			</div>
 		</>
 	);
